@@ -194,6 +194,7 @@ ckd-classification/
 ├── ckd_dashboard.py                 # Main Streamlit application
 ├── requirements.txt                 # Python dependencies
 ├── README.md                        # Project documentation
+├── LICENSE.md
 │
 ├── data/
 │   ├── raw_CKD_Dataset.csv     # original dataset
