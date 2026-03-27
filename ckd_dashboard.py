@@ -1,6 +1,5 @@
 # ============================================================================
-# ENHANCED CKD CLASSIFICATION DASHBOARD - DEPLOYMENT READY VERSION
-# Fixed file path handling for deployment
+# ENHANCED CKD CLASSIFICATION DASHBOARD - FIXED DATASET PATH
 # ============================================================================
 
 import streamlit as st
@@ -19,8 +18,6 @@ from sklearn.metrics import (accuracy_score, classification_report, confusion_ma
                              balanced_accuracy_score, f1_score, matthews_corrcoef)
 from sklearn.model_selection import train_test_split, cross_val_score
 import warnings
-import os
-
 warnings.filterwarnings('ignore')
 
 # ============================================================================
@@ -33,28 +30,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-# ============================================================================
-# CONFIGURATION - SET DATA PATH
-# ============================================================================
-
-# Get the directory where the script is located
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Define possible data file paths (in order of preference)
-DATA_PATHS = [
-    os.path.join(CURRENT_DIR, 'data', 'CKD_Dataset_Enhanced.csv'),  # data folder (deployment)
-    os.path.join(CURRENT_DIR, 'CKD_Dataset_Enhanced.csv'),          # root folder
-    'data/CKD_Dataset_Enhanced.csv',                                 # relative path
-    'CKD_Dataset_Enhanced.csv',                                      # simple filename
-]
-
-# Find the first existing data file
-DATA_FILE = None
-for path in DATA_PATHS:
-    if os.path.exists(path):
-        DATA_FILE = path
-        break
 
 # ============================================================================
 # CKD STAGE MAPPING (Based on CKD_Stage_CGA column from R processing)
@@ -159,14 +134,13 @@ SIMPLIFIED_STAGES = {
 }
 
 # ============================================================================
-# CUSTOM CSS - ADDED CLINICAL PARAMETERS STYLES
+# CUSTOM CSS
 # ============================================================================
 
 st.markdown("""
 <style>
     .main-header {
         font-size: 2rem;
-        color: #2c3e50;
         text-align: center;
         padding: 1rem;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -183,41 +157,15 @@ st.markdown("""
         animation: slideIn 0.5s ease-out;
     }
     @keyframes slideIn {
-        from {
-            transform: translateY(-20px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
-    .healthy-card {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-    }
-    .stage1-card {
-        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-    }
-    .stage2-card {
-        background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
-    }
-    .stage3-card {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-    }
-    .stage4-card {
-        background: linear-gradient(135deg, #c0392b 0%, #8e44ad 100%);
-    }
-    .stage5-card {
-        background: linear-gradient(135deg, #8e44ad 0%, #2c3e50 100%);
-    }
-    .metric-card {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 10px;
-        text-align: center;
-        border-left: 4px solid #667eea;
-        margin: 0.5rem 0;
-    }
+    .healthy-card { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
+    .stage1-card { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
+    .stage2-card { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); }
+    .stage3-card { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+    .stage4-card { background: linear-gradient(135deg, #c0392b 0%, #8e44ad 100%); }
+    .stage5-card { background: linear-gradient(135deg, #8e44ad 0%, #2c3e50 100%); }
     .info-box {
         background-color: #f8f9fa;
         padding: 1rem;
@@ -242,69 +190,14 @@ st.markdown("""
         margin: 0.5rem 0;
         transition: transform 0.2s;
     }
-    .clinical-param-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-    .param-value {
-        font-size: 1.8rem;
-        font-weight: bold;
-        margin: 0.5rem 0;
-    }
-    .param-label {
-        font-size: 0.9rem;
-        color: #7f8c8d;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    .param-status {
-        font-size: 0.85rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 20px;
-        display: inline-block;
-        margin-top: 0.5rem;
-    }
-    .status-normal {
-        background-color: #d4edda;
-        color: #155724;
-    }
-    .status-mild {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-    .status-moderate {
-        background-color: #ffe5b4;
-        color: #cc7b00;
-    }
-    .status-severe {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-    .risk-low {
-        background-color: #d4edda;
-        color: #155724;
-        padding: 0.5rem;
-        border-radius: 5px;
-    }
-    .risk-moderate {
-        background-color: #fff3cd;
-        color: #856404;
-        padding: 0.5rem;
-        border-radius: 5px;
-    }
-    .risk-high {
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 0.5rem;
-        border-radius: 5px;
-    }
-    .risk-very-high {
-        background-color: #dc3545;
-        color: white;
-        padding: 0.5rem;
-        border-radius: 5px;
-        font-weight: bold;
-    }
+    .clinical-param-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+    .param-value { font-size: 1.8rem; font-weight: bold; margin: 0.5rem 0; }
+    .param-label { font-size: 0.9rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
+    .param-status { font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 20px; display: inline-block; margin-top: 0.5rem; }
+    .status-normal { background-color: #d4edda; color: #155724; }
+    .status-mild { background-color: #fff3cd; color: #856404; }
+    .status-moderate { background-color: #ffe5b4; color: #cc7b00; }
+    .status-severe { background-color: #f8d7da; color: #721c24; }
     .stButton > button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -317,183 +210,42 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         transition: all 0.3s ease;
     }
-    .clinical-dashboard {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 1.5rem;
-        border-radius: 15px;
-        margin: 1rem 0;
-    }
-    .dashboard-title {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #2c3e50;
-        margin-bottom: 1rem;
-        text-align: center;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================================================================
-# DATA LOADING (CACHED) - DEPLOYMENT READY
+# DATA LOADING - FIXED PATH
 # ============================================================================
 
 @st.cache_data
 def load_enhanced_data():
-    """Load the enhanced dataset with CKD_Stage_CGA column - works locally and on deployment"""
+    """Load the enhanced dataset from your specific directory"""
+    # Your exact file path
+    file_path = 'C:/Users/USER/Downloads/ckd-classification/data/CKD_Dataset_Enhanced.csv'
     
-    global DATA_FILE
-    
-    # If we found a data file earlier, try to load it
-    if DATA_FILE and os.path.exists(DATA_FILE):
-        try:
-            df = pd.read_csv(DATA_FILE)
-            return df
-        except Exception as e:
-            st.sidebar.warning(f"⚠️ Error loading data file: {e}")
-            return None
-    
-    # Also check current directory for any CSV file with CKD in name
-    for file in os.listdir(CURRENT_DIR):
-        if 'CKD' in file and file.endswith('.csv'):
-            try:
-                df = pd.read_csv(os.path.join(CURRENT_DIR, file))
-                DATA_FILE = os.path.join(CURRENT_DIR, file)
-                return df
-            except:
-                continue
-    
-    return None
-
-@st.cache_data
-def generate_sample_data_with_cga(n_samples=5000):
-    """Generate sample data with CKD_Stage_CGA column for demonstration"""
-    np.random.seed(42)
-    
-    # Generate features
-    data = {
-        'Age': np.random.randint(18, 90, n_samples),
-        'Gender': np.random.choice(['Male', 'Female'], n_samples),
-        'BMI': np.random.uniform(18, 40, n_samples),
-        'Systolic_BP': np.random.randint(90, 180, n_samples),
-        'Diastolic_BP': np.random.randint(60, 110, n_samples),
-        'Diabetes': np.random.choice(['Yes', 'No'], n_samples, p=[0.3, 0.7]),
-        'Hypertension': np.random.choice(['Yes', 'No'], n_samples, p=[0.35, 0.65]),
-        'Smoking_Status': np.random.choice(['Yes', 'No'], n_samples, p=[0.25, 0.75]),
-        'Family_History_Kidney': np.random.choice(['Yes', 'No'], n_samples, p=[0.2, 0.8]),
-        'Hemoglobin': np.random.uniform(8, 16, n_samples),
-        'RBC_Count': np.random.uniform(3.5, 5.5, n_samples),
-        'WBC_Count': np.random.uniform(4, 11, n_samples),
-        'Platelet_Count': np.random.randint(150, 450, n_samples),
-        'Serum_Creatinine': np.random.uniform(0.5, 8.0, n_samples),
-        'Blood_Urea_Nitrogen': np.random.uniform(7, 80, n_samples),
-        'eGFR': np.random.uniform(15, 120, n_samples),
-        'Albumin_Creatinine_Ratio': np.random.uniform(5, 500, n_samples),
-        'Urine_Protein': np.random.uniform(10, 600, n_samples),
-        'Bicarbonate': np.random.uniform(18, 28, n_samples),
-        'Potassium': np.random.uniform(3.5, 5.5, n_samples)
-    }
-    
-    df = pd.DataFrame(data)
-    
-    # Assign GFR categories
-    df['GFR_Category'] = pd.cut(df['eGFR'], 
-                                  bins=[0, 15, 30, 45, 60, 90, 200],
-                                  labels=['G5', 'G4', 'G3b', 'G3a', 'G2', 'G1'],
-                                  right=False)
-    
-    # Assign Albuminuria categories
-    df['Albuminuria_Category'] = pd.cut(df['Albumin_Creatinine_Ratio'],
-                                         bins=[0, 30, 300, 10000],
-                                         labels=['A1', 'A2', 'A3'],
-                                         right=False)
-    
-    # Determine kidney damage
-    df['Has_Kidney_Damage'] = (
-        (df['Albuminuria_Category'].isin(['A2', 'A3'])) |
-        (df['Urine_Protein'] > 150) |
-        ((df['Diabetes'] == 'Yes') & (df['eGFR'] < 90)) |
-        ((df['Hypertension'] == 'Yes') & (df['eGFR'] < 90))
-    )
-    
-    # Assign CKD stage based on CGA
-    def assign_cga_stage(row):
-        gfr = row['GFR_Category']
-        albuminuria = row['Albuminuria_Category']
-        has_damage = row['Has_Kidney_Damage']
-        age = row['Age']
-        
-        if age >= 70 and gfr in ['G1', 'G2'] and not has_damage:
-            return 'No CKD (Normal Aging)'
-        
-        if gfr == 'G1':
-            return 'Stage 1 CKD' if has_damage else 'No CKD'
-        elif gfr == 'G2':
-            return 'Stage 2 CKD' if has_damage else 'No CKD'
-        elif gfr == 'G3a':
-            return 'Stage 3a CKD'
-        elif gfr == 'G3b':
-            return 'Stage 3b CKD'
-        elif gfr == 'G4':
-            return 'Stage 4 CKD'
-        elif gfr == 'G5':
-            return 'Stage 5 CKD (Kidney Failure)'
-        else:
-            return 'Unclassified'
-    
-    df['CKD_Stage_CGA'] = df.apply(assign_cga_stage, axis=1)
-    
-    # Assign KDIGO risk level
-    risk_matrix = {
-        ('G1', 'A1'): 'Low', ('G1', 'A2'): 'Moderate', ('G1', 'A3'): 'High',
-        ('G2', 'A1'): 'Low', ('G2', 'A2'): 'Moderate', ('G2', 'A3'): 'High',
-        ('G3a', 'A1'): 'Moderate', ('G3a', 'A2'): 'High', ('G3a', 'A3'): 'Very High',
-        ('G3b', 'A1'): 'High', ('G3b', 'A2'): 'Very High', ('G3b', 'A3'): 'Very High',
-        ('G4', 'A1'): 'Very High', ('G4', 'A2'): 'Very High', ('G4', 'A3'): 'Very High',
-        ('G5', 'A1'): 'Very High', ('G5', 'A2'): 'Very High', ('G5', 'A3'): 'Very High'
-    }
-    
-    df['KDIGO_Risk_Level'] = df.apply(
-        lambda x: risk_matrix.get((x['GFR_Category'], x['Albuminuria_Category']), 'Unknown'), axis=1
-    )
-    
-    # Calculate risk score
-    df['CKD_Risk_Score'] = (
-        (df['Age'] > 60).astype(int) * 2 +
-        (df['Age'] > 50).astype(int) * 1 +
-        (df['Diabetes'] == 'Yes').astype(int) * 3 +
-        (df['Hypertension'] == 'Yes').astype(int) * 2 +
-        (df['Smoking_Status'] == 'Yes').astype(int) * 1 +
-        (df['Family_History_Kidney'] == 'Yes').astype(int) * 1 +
-        (df['eGFR'] < 30).astype(int) * 4 +
-        (df['eGFR'] < 45).astype(int) * 2 +
-        (df['Serum_Creatinine'] > 1.5).astype(int) * 2 +
-        (df['Albuminuria_Category'] == 'A3').astype(int) * 3 +
-        (df['Albuminuria_Category'] == 'A2').astype(int) * 2
-    )
-    
-    df['Risk_Level'] = pd.cut(df['CKD_Risk_Score'],
-                               bins=[-1, 2, 5, 8, 12, 100],
-                               labels=['Minimal Risk', 'Low Risk', 'Moderate Risk', 'High Risk', 'Very High Risk'])
-    
-    # Simplified target for 6-class classification
-    df['Target'] = df['CKD_Stage_CGA'].map(SIMPLIFIED_STAGES)
-    
-    return df
+    try:
+        df = pd.read_csv(file_path)
+        return df
+    except FileNotFoundError:
+        st.error(f"❌ Dataset not found at: {file_path}")
+        st.info("Please ensure the file exists at the specified location")
+        return None
+    except Exception as e:
+        st.error(f"Error loading dataset: {e}")
+        return None
 
 # ============================================================================
-# DATA PREPARATION WITH SILENT NAN HANDLING
+# DATA PREPARATION - ALWAYS 80/20 SPLIT
 # ============================================================================
 
 @st.cache_data
 def prepare_data():
-    """Load and prepare data with proper train/test split and NaN handling - no messages"""
+    """Load and prepare data with 80/20 train-test split"""
     
     df = load_enhanced_data()
+    
     if df is None:
-        df = generate_sample_data_with_cga(5000)
-        st.sidebar.info("📊 Using generated sample data (5000 samples)")
-    else:
-        st.sidebar.success(f"✅ Loaded dataset: {len(df)} samples, {len(df.columns)} features")
+        st.stop()  # Stop execution if no data
     
     # Define feature columns
     feature_cols = ['Age', 'BMI', 'Systolic_BP', 'Diastolic_BP', 'Hemoglobin', 
@@ -513,18 +265,17 @@ def prepare_data():
         else:
             X[col] = X[col].map({'No': 0, 'Yes': 1})
     
-    # Handle missing values silently
+    # Handle missing values
     if X.isnull().any().any():
         for col in X.columns:
             if X[col].isnull().any():
                 median_val = X[col].median()
                 X[col].fillna(median_val, inplace=True)
     
-    # Final check - fill any remaining NaN silently
     if X.isnull().any().any():
         X = X.fillna(0)
     
-    # Train-test split (80-20)
+    # ALWAYS 80/20 TRAIN-TEST SPLIT
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
@@ -534,7 +285,6 @@ def prepare_data():
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
     
-    # Create dataframes with proper column names
     X_train_df = pd.DataFrame(X_train, columns=X.columns)
     X_test_df = pd.DataFrame(X_test, columns=X.columns)
     
@@ -552,12 +302,12 @@ def prepare_data():
     }
 
 # ============================================================================
-# MODEL TRAINING - SILENT VERSION
+# MODEL TRAINING
 # ============================================================================
 
 @st.cache_resource
 def train_models(_data):
-    """Train multiple models for comparison - no messages"""
+    """Train multiple models for comparison"""
     models = {
         'Random Forest': RandomForestClassifier(
             n_estimators=200, max_depth=15, random_state=42, 
@@ -589,7 +339,8 @@ def train_models(_data):
                 'balanced_accuracy': balanced_accuracy_score(_data['y_test'], y_pred),
                 'f1_weighted': f1_score(_data['y_test'], y_pred, average='weighted')
             }
-        except Exception:
+        except Exception as e:
+            st.warning(f"⚠️ Error training {name}: {str(e)[:100]}")
             results[name] = {
                 'model': None,
                 'y_pred': None,
@@ -601,33 +352,27 @@ def train_models(_data):
     return results
 
 # ============================================================================
-# PREDICTION FUNCTION - UPDATED WITH COMPLETE KIDNEY DAMAGE LOGIC
+# PREDICTION FUNCTION
 # ============================================================================
 
 def predict_ckd_stage(input_data, data, models):
     """Predict CKD stage using multiple models and clinical guidelines"""
     
-    # Create dataframe with all required features
     input_df = pd.DataFrame([input_data])
     
-    # Encode categorical variables
     input_df['Gender'] = input_df['Gender'].map({'Male': 0, 'Female': 1})
     input_df['Diabetes'] = input_df['Diabetes'].map({'No': 0, 'Yes': 1})
     input_df['Hypertension'] = input_df['Hypertension'].map({'No': 0, 'Yes': 1})
     input_df['Smoking_Status'] = input_df['Smoking_Status'].map({'No': 0, 'Yes': 1})
     input_df['Family_History_Kidney'] = input_df['Family_History_Kidney'].map({'No': 0, 'Yes': 1})
     
-    # Ensure all required columns are present and in correct order
     for col in data['feature_names']:
         if col not in input_df.columns:
             input_df[col] = 0
     
     input_df = input_df[data['feature_names']]
-    
-    # Handle any NaN in input
     input_df = input_df.fillna(0)
     
-    # Extract clinical values
     egfr = input_data['eGFR']
     age = input_data['Age']
     acr = input_data.get('Albumin_Creatinine_Ratio', 0)
@@ -639,7 +384,6 @@ def predict_ckd_stage(input_data, data, models):
     diabetes = input_data.get('Diabetes', 'No')
     hypertension = input_data.get('Hypertension', 'No')
     
-    # GFR category
     if egfr >= 90:
         gfr_cat = 'G1'
     elif egfr >= 60:
@@ -653,7 +397,6 @@ def predict_ckd_stage(input_data, data, models):
     else:
         gfr_cat = 'G5'
     
-    # Albuminuria category
     if acr < 30:
         alb_cat = 'A1'
     elif acr <= 300:
@@ -661,7 +404,6 @@ def predict_ckd_stage(input_data, data, models):
     else:
         alb_cat = 'A3'
     
-    # KDIGO risk
     risk_matrix = {
         ('G1', 'A1'): 'Low', ('G1', 'A2'): 'Moderate', ('G1', 'A3'): 'High',
         ('G2', 'A1'): 'Low', ('G2', 'A2'): 'Moderate', ('G2', 'A3'): 'High',
@@ -672,25 +414,16 @@ def predict_ckd_stage(input_data, data, models):
     }
     kdigo_risk = risk_matrix.get((gfr_cat, alb_cat), 'Unknown')
     
-    # COMPLETE KIDNEY DAMAGE DETECTION (Matches R script logic)
     diabetes_bool = diabetes == 'Yes'
     hypertension_bool = hypertension == 'Yes'
-    
-    # Albuminuria present (ACR >= 30 OR urine albumin > 30)
     albuminuria_present = (acr >= 30) or (urine_albumin > 30)
-    
-    # Proteinuria present (urine protein > 30)
     proteinuria_present = (urine_protein > 30)
     
-    # Evidence of kidney damage (matches R logic)
     has_damage = (
-        albuminuria_present or
-        proteinuria_present or
-        (diabetes_bool and egfr < 90) or
-        (hypertension_bool and egfr < 90)
+        albuminuria_present or proteinuria_present or
+        (diabetes_bool and egfr < 90) or (hypertension_bool and egfr < 90)
     )
     
-    # Clinical staging (matches R logic)
     if age >= 70 and gfr_cat in ['G1', 'G2'] and not has_damage:
         clinical_stage = 'No CKD (Normal Aging)'
     elif gfr_cat == 'G1':
@@ -706,7 +439,6 @@ def predict_ckd_stage(input_data, data, models):
     else:
         clinical_stage = 'Stage 5 CKD (Kidney Failure)'
     
-    # Model predictions
     model_predictions = {}
     for name, result in models.items():
         if result['model'] is not None:
@@ -722,7 +454,6 @@ def predict_ckd_stage(input_data, data, models):
         else:
             model_predictions[name] = "Not available"
     
-    # Add clinical parameters for dashboard
     clinical_params = {
         'egfr': egfr,
         'egfr_status': get_egfr_status(egfr),
@@ -733,7 +464,6 @@ def predict_ckd_stage(input_data, data, models):
         'bp_status': get_bp_status(systolic_bp, diastolic_bp)
     }
     
-    # Return comprehensive results
     return {
         'clinical_stage': clinical_stage,
         'gfr_category': gfr_cat,
@@ -752,7 +482,6 @@ def predict_ckd_stage(input_data, data, models):
         }
     }
 
-# Helper functions for status determination
 def get_egfr_status(egfr):
     if egfr >= 90:
         return {'text': 'Normal', 'class': 'status-normal', 'description': 'Normal kidney function'}
@@ -789,7 +518,7 @@ def get_bp_status(systolic, diastolic):
 # MAIN APPLICATION
 # ============================================================================
 
-# Load data and train models silently
+# Load data and train models
 data = prepare_data()
 models = train_models(data)
 
@@ -813,7 +542,6 @@ else:
         'importance': np.ones(len(data['feature_names'])) / len(data['feature_names'])
     }).sort_values('importance', ascending=False)
 
-# Get top features for selection in visualizations
 top_features = feature_importance['feature'].tolist()
 
 # ============================================================================
@@ -909,10 +637,8 @@ with tab1:
         acr = st.number_input("Urine Albumin-to-Creatinine Ratio (mg/g)", min_value=0, max_value=1000, value=10, step=5)
         
         st.subheader("Urine Analysis")
-        urine_albumin = st.number_input("Urine Albumin (mg/dL)", min_value=0, max_value=500, value=20, step=10, 
-                                        help="Direct urine albumin measurement")
-        urine_protein = st.number_input("Urine Protein (mg/dL)", min_value=0, max_value=600, value=30, step=10,
-                                        help="Direct urine protein measurement")
+        urine_albumin = st.number_input("Urine Albumin (mg/dL)", min_value=0, max_value=500, value=20, step=10)
+        urine_protein = st.number_input("Urine Protein (mg/dL)", min_value=0, max_value=600, value=30, step=10)
     
     if st.button("🔍 Predict CKD Stage (KDIGO 2026)", type="primary"):
         
@@ -932,7 +658,6 @@ with tab1:
         result = predict_ckd_stage(input_dict, data, models)
         stage_info = CKD_STAGES_CGA.get(result['clinical_stage'], CKD_STAGES_CGA['Unclassified'])
         
-        # Prediction Card
         st.markdown(f"""
         <div class="prediction-card {stage_info['card_class']}">
             <h1 style="font-size: 2.5rem;">{stage_info['icon']} {stage_info['display_name']}</h1>
@@ -945,9 +670,7 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
         
-        # Clinical Parameters Dashboard
         st.markdown("### 📊 Key Clinical Parameters")
-        
         cp = result['clinical_params']
         
         col_a, col_b, col_c = st.columns(3)
@@ -958,7 +681,7 @@ with tab1:
                 <div class="param-label">eGFR</div>
                 <div class="param-value">{cp['egfr']:.0f} <span style="font-size: 0.9rem;">mL/min/1.73m²</span></div>
                 <div class="param-status {cp['egfr_status']['class']}">{cp['egfr_status']['text']}</div>
-                <div style="font-size: 0.8rem; color: #7f8c8d; margin-top: 0.5rem;">{cp['egfr_status']['description']}</div>
+                <div style="font-size: 0.8rem; color: #7f8c8d;">{cp['egfr_status']['description']}</div>
             </div>
             """, unsafe_allow_html=True)
         
@@ -968,7 +691,7 @@ with tab1:
                 <div class="param-label">Serum Creatinine</div>
                 <div class="param-value">{cp['creatinine']:.2f} <span style="font-size: 0.9rem;">mg/dL</span></div>
                 <div class="param-status {cp['creatinine_status']['class']}">{cp['creatinine_status']['text']}</div>
-                <div style="font-size: 0.8rem; color: #7f8c8d; margin-top: 0.5rem;">{cp['creatinine_status']['description']}</div>
+                <div style="font-size: 0.8rem; color: #7f8c8d;">{cp['creatinine_status']['description']}</div>
             </div>
             """, unsafe_allow_html=True)
         
@@ -978,15 +701,13 @@ with tab1:
                 <div class="param-label">Blood Pressure</div>
                 <div class="param-value">{cp['systolic_bp']:.0f}/{cp['diastolic_bp']:.0f} <span style="font-size: 0.9rem;">mmHg</span></div>
                 <div class="param-status {cp['bp_status']['class']}">{cp['bp_status']['text']}</div>
-                <div style="font-size: 0.8rem; color: #7f8c8d; margin-top: 0.5rem;">{cp['bp_status']['description']}</div>
+                <div style="font-size: 0.8rem; color: #7f8c8d;">{cp['bp_status']['description']}</div>
             </div>
             """, unsafe_allow_html=True)
         
         st.markdown("---")
         
-        # KIDNEY DAMAGE ASSESSMENT SECTION
         st.subheader("🔍 Kidney Damage Assessment")
-        
         kd_details = result.get('kidney_damage_details', {})
         kidney_damage_factors = []
         kidney_damage_present = result['has_kidney_damage']
@@ -1019,66 +740,36 @@ with tab1:
                 st.markdown(f"- 🔴 {factor}")
             st.warning("Kidney damage markers present. Further evaluation recommended.")
         else:
-            st.success("✅ No evidence of kidney damage detected based on current parameters.")
-            st.markdown("""
-            - No albuminuria/proteinuria detected
-            - No diabetes or hypertension with reduced kidney function
-            - Continue maintaining healthy lifestyle
-            """)
+            st.success("✅ No evidence of kidney damage detected.")
         
         st.markdown("---")
         
-        # KEY RISK FACTORS SECTION
         st.subheader("⚠️ Key Risk Factors")
         risk_factors = []
         
-        if diabetes == "Yes":
-            risk_factors.append("Diabetes")
-        if hypertension == "Yes":
-            risk_factors.append("Hypertension")
-        if family_history == "Yes":
-            risk_factors.append("Family History of Kidney Disease")
-        if smoking == "Yes":
-            risk_factors.append("Smoking")
-        if creatinine > 1.2:
-            risk_factors.append(f"Elevated Creatinine ({creatinine:.2f} mg/dL)")
-        if egfr < 60:
-            risk_factors.append(f"Low eGFR ({egfr:.0f} mL/min/1.73m²)")
-        if age > 60:
-            risk_factors.append(f"Advanced Age ({age} years)")
-        if hemoglobin < 12:
-            risk_factors.append(f"Low Hemoglobin ({hemoglobin:.1f} g/dL)")
-        if bmi >= 30:
-            risk_factors.append(f"Obesity (BMI: {bmi:.1f})")
-        if bmi >= 25 and bmi < 30:
-            risk_factors.append(f"Overweight (BMI: {bmi:.1f})")
-        if systolic_bp >= 130 or diastolic_bp >= 85:
-            risk_factors.append(f"Elevated Blood Pressure ({systolic_bp}/{diastolic_bp} mmHg)")
-        if acr >= 30:
-            risk_factors.append(f"Albuminuria (ACR: {acr:.0f} mg/g)")
-        if urine_protein > 30:
-            risk_factors.append(f"Proteinuria (Urine Protein: {urine_protein:.0f} mg/dL)")
-        if urine_albumin > 30:
-            risk_factors.append(f"Elevated Urine Albumin ({urine_albumin:.0f} mg/dL)")
+        if diabetes == "Yes": risk_factors.append("Diabetes")
+        if hypertension == "Yes": risk_factors.append("Hypertension")
+        if family_history == "Yes": risk_factors.append("Family History of Kidney Disease")
+        if smoking == "Yes": risk_factors.append("Smoking")
+        if creatinine > 1.2: risk_factors.append(f"Elevated Creatinine ({creatinine:.2f} mg/dL)")
+        if egfr < 60: risk_factors.append(f"Low eGFR ({egfr:.0f} mL/min/1.73m²)")
+        if age > 60: risk_factors.append(f"Advanced Age ({age} years)")
+        if hemoglobin < 12: risk_factors.append(f"Low Hemoglobin ({hemoglobin:.1f} g/dL)")
+        if bmi >= 30: risk_factors.append(f"Obesity (BMI: {bmi:.1f})")
+        if bmi >= 25 and bmi < 30: risk_factors.append(f"Overweight (BMI: {bmi:.1f})")
+        if systolic_bp >= 130 or diastolic_bp >= 85: risk_factors.append(f"Elevated BP ({systolic_bp}/{diastolic_bp} mmHg)")
+        if acr >= 30: risk_factors.append(f"Albuminuria (ACR: {acr:.0f} mg/g)")
+        if urine_protein > 30: risk_factors.append(f"Proteinuria (Urine Protein: {urine_protein:.0f} mg/dL)")
         
         if risk_factors:
             st.markdown("**Present risk factors:**")
             for factor in risk_factors:
                 st.markdown(f"- ⚠️ {factor}")
-            
-            risk_count = len(risk_factors)
-            if risk_count >= 5:
-                st.error(f"🚨 High risk: {risk_count} risk factors identified. Immediate medical consultation recommended.")
-            elif risk_count >= 3:
-                st.warning(f"⚠️ Moderate risk: {risk_count} risk factors identified. Schedule medical evaluation.")
-            elif risk_count >= 1:
-                st.info(f"ℹ️ {risk_count} risk factor(s) identified. Monitor and maintain healthy lifestyle.")
         else:
             st.success("✅ No major risk factors identified")
         
         st.markdown("---")
         
-        # CGA Classification
         st.markdown(f"""
         <div class="clinical-note">
             <strong>📋 CGA Classification:</strong><br>
@@ -1089,12 +780,11 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
         
-        # Clinical Recommendations
         st.subheader("📋 Clinical Recommendations")
         st.info(stage_info['recommendation'])
         
         if kidney_damage_present:
-            st.warning("🔴 **Kidney Damage Present:** Immediate nephrology consultation recommended for proper management.")
+            st.warning("🔴 **Kidney Damage Present:** Immediate nephrology consultation recommended.")
 
 # ============================================================================
 # TAB 2: EDA & CGA Analysis
@@ -1144,10 +834,7 @@ with tab2:
     fig_scatter.add_hline(y=300, line_dash="dash", line_color="red", annotation_text="A3 Threshold")
     st.plotly_chart(fig_scatter, use_container_width=True)
 
-    # Correlation heatmap
     st.subheader("Correlation Heatmap")
-    st.markdown("Select features for correlation analysis")
-    
     numeric_cols = data['df'].select_dtypes(include=[np.number]).columns.tolist()
     available_features = [f for f in top_features if f in numeric_cols]
     
@@ -1159,7 +846,6 @@ with tab2:
     
     if len(corr_features) >= 2:
         corr_matrix = data['df'][corr_features].corr()
-        
         fig, ax = plt.subplots(figsize=(12, 10))
         mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
         sns.heatmap(corr_matrix, mask=mask, annot=True, fmt='.2f', cmap='coolwarm', 
@@ -1232,7 +918,7 @@ with tab3:
                 col1.metric("Accuracy", f"{acc:.4f}")
                 col2.metric("Balanced Accuracy", f"{bal_acc:.4f}")
     
-    else:  # KNN
+    else:
         k_value = st.slider("k value", 3, 31, 11, step=2)
         
         if st.button("Train Model", type="primary"):
@@ -1248,7 +934,7 @@ with tab3:
                 col2.metric("Balanced Accuracy", f"{bal_acc:.4f}")
 
 # ============================================================================
-# TAB 4: 2D VISUALIZATIONS
+# TAB 4: 2D VISUALIZATIONS (FIXED)
 # ============================================================================
 
 with tab4:
@@ -1267,15 +953,25 @@ with tab4:
     st.plotly_chart(fig_importance, use_container_width=True)
     
     st.subheader("Confusion Matrix - Random Forest")
-    y_pred_rf = models['Random Forest']['y_pred']
+    
+    # FIX: Check if y_pred exists and has correct length
+    y_pred_rf = models.get('Random Forest', {}).get('y_pred', None)
+    
     if y_pred_rf is not None:
-        cm = confusion_matrix(data['y_test'], y_pred_rf, labels=data['target_classes'])
-        fig_cm = px.imshow(cm, text_auto=True, aspect="auto",
-                           x=data['target_classes'], y=data['target_classes'],
-                           labels=dict(x="Predicted", y="Actual", color="Count"),
-                           title="Confusion Matrix",
-                           color_continuous_scale='Blues')
-        st.plotly_chart(fig_cm, use_container_width=True)
+        # Check if lengths match
+        if len(data['y_test']) == len(y_pred_rf):
+            cm = confusion_matrix(data['y_test'], y_pred_rf, labels=data['target_classes'])
+            fig_cm = px.imshow(cm, text_auto=True, aspect="auto",
+                               x=data['target_classes'], y=data['target_classes'],
+                               labels=dict(x="Predicted", y="Actual", color="Count"),
+                               title="Confusion Matrix - Random Forest",
+                               color_continuous_scale='Blues')
+            st.plotly_chart(fig_cm, use_container_width=True)
+        else:
+            st.warning(f"⚠️ Data mismatch: Test set has {len(data['y_test'])} samples, predictions have {len(y_pred_rf)} samples.")
+            st.info("Please retrain the model in the Model Training tab.")
+    else:
+        st.info("📊 No predictions available for Random Forest. Please train the model first.")
 
     # 2D Scatter Plot
     st.subheader("2D Feature Relationships")
@@ -1326,7 +1022,6 @@ with tab5:
     )
     st.plotly_chart(fig_3d, use_container_width=True)
     
-    # 3D by stage
     st.subheader("3D Visualization by CKD Stage")
     fig_3d_stage = px.scatter_3d(
         plot_data, x=x_3d, y=y_3d, z=z_3d, color='Target',
@@ -1364,7 +1059,7 @@ with tab6:
     st.plotly_chart(fig, use_container_width=True)
 
 # ============================================================================
-# TAB 7: ABOUT - WITH PROFILE SECTION
+# TAB 7: ABOUT
 # ============================================================================
 
 with tab7:
@@ -1422,7 +1117,6 @@ with tab7:
         </div>
         """, unsafe_allow_html=True)
         
-        # Profile Section
         st.markdown("""
         <div style="text-align: center; margin-top: 2rem;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
