@@ -17,17 +17,6 @@ An interactive machine learning dashboard for early detection and staging of Chr
 3. [KDIGO 2026 Staging System](#-kdigo-2026-staging-system)
 4. [Data Dictionary](#-data-dictionary)
 5. [Installation](#-installation)
-6. [Dataset Description](#-dataset-description)
-7. [Methodology](#-methodology)
-8. [Models Implemented](#-models-implemented)
-9. [Results](#-results)
-10. [Usage Guide](#-usage-guide)
-11. [Dashboard Features](#-dashboard-features)
-12. [Project Structure](#-project-structure)
-13. [Future Improvements](#-future-improvements)
-14. [Contributing](#-contributing)
-15. [License](#-license)
-16. [Acknowledgments](#-acknowledgments)
 
 ---
 
