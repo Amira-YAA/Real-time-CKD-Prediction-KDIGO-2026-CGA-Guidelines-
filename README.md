@@ -122,7 +122,7 @@ This project implements a comprehensive machine learning pipeline for **early de
 | Column | Description |
 |--------|-------------|
 | Age | Patient age (18-100 years) |
-| Gender | Male / Female |
+| Gender | Male (1) / Female (0) |
 | BMI | Body Mass Index (15-50 kg/m²) |
 
 ### Vital Signs
