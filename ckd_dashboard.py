@@ -1,5 +1,5 @@
 # ============================================================================
-# ENHANCED CKD CLASSIFICATION DASHBOARD - FIXED DATASET PATH
+# ENHANCED CKD CLASSIFICATION DASHBOARD 
 # ============================================================================
 
 import streamlit as st
@@ -221,7 +221,7 @@ st.markdown("""
 def load_enhanced_data():
     """Load the enhanced dataset from your specific directory"""
     # Your exact file path
-    file_path = 'C:/Users/USER/Downloads/ckd-classification/data/CKD_Dataset_Enhanced.csv'
+    file_path = 'data/CKD_Dataset_Enhanced.csv'
     
     try:
         df = pd.read_csv(file_path)
@@ -834,7 +834,10 @@ with tab2:
     fig_scatter.add_hline(y=300, line_dash="dash", line_color="red", annotation_text="A3 Threshold")
     st.plotly_chart(fig_scatter, use_container_width=True)
 
+    # Correlation heatmap
     st.subheader("Correlation Heatmap")
+    st.markdown("Select features for correlation analysis")
+    
     numeric_cols = data['df'].select_dtypes(include=[np.number]).columns.tolist()
     available_features = [f for f in top_features if f in numeric_cols]
     
@@ -846,6 +849,7 @@ with tab2:
     
     if len(corr_features) >= 2:
         corr_matrix = data['df'][corr_features].corr()
+        
         fig, ax = plt.subplots(figsize=(12, 10))
         mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
         sns.heatmap(corr_matrix, mask=mask, annot=True, fmt='.2f', cmap='coolwarm', 
@@ -918,7 +922,7 @@ with tab3:
                 col1.metric("Accuracy", f"{acc:.4f}")
                 col2.metric("Balanced Accuracy", f"{bal_acc:.4f}")
     
-    else:
+    else:  # KNN
         k_value = st.slider("k value", 3, 31, 11, step=2)
         
         if st.button("Train Model", type="primary"):
@@ -934,7 +938,7 @@ with tab3:
                 col2.metric("Balanced Accuracy", f"{bal_acc:.4f}")
 
 # ============================================================================
-# TAB 4: 2D VISUALIZATIONS (FIXED)
+# TAB 4: 2D VISUALIZATIONS
 # ============================================================================
 
 with tab4:
@@ -953,25 +957,15 @@ with tab4:
     st.plotly_chart(fig_importance, use_container_width=True)
     
     st.subheader("Confusion Matrix - Random Forest")
-    
-    # FIX: Check if y_pred exists and has correct length
-    y_pred_rf = models.get('Random Forest', {}).get('y_pred', None)
-    
+    y_pred_rf = models['Random Forest']['y_pred']
     if y_pred_rf is not None:
-        # Check if lengths match
-        if len(data['y_test']) == len(y_pred_rf):
-            cm = confusion_matrix(data['y_test'], y_pred_rf, labels=data['target_classes'])
-            fig_cm = px.imshow(cm, text_auto=True, aspect="auto",
-                               x=data['target_classes'], y=data['target_classes'],
-                               labels=dict(x="Predicted", y="Actual", color="Count"),
-                               title="Confusion Matrix - Random Forest",
-                               color_continuous_scale='Blues')
-            st.plotly_chart(fig_cm, use_container_width=True)
-        else:
-            st.warning(f"⚠️ Data mismatch: Test set has {len(data['y_test'])} samples, predictions have {len(y_pred_rf)} samples.")
-            st.info("Please retrain the model in the Model Training tab.")
-    else:
-        st.info("📊 No predictions available for Random Forest. Please train the model first.")
+        cm = confusion_matrix(data['y_test'], y_pred_rf, labels=data['target_classes'])
+        fig_cm = px.imshow(cm, text_auto=True, aspect="auto",
+                           x=data['target_classes'], y=data['target_classes'],
+                           labels=dict(x="Predicted", y="Actual", color="Count"),
+                           title="Confusion Matrix",
+                           color_continuous_scale='Blues')
+        st.plotly_chart(fig_cm, use_container_width=True)
 
     # 2D Scatter Plot
     st.subheader("2D Feature Relationships")
@@ -1022,6 +1016,7 @@ with tab5:
     )
     st.plotly_chart(fig_3d, use_container_width=True)
     
+    # 3D by stage
     st.subheader("3D Visualization by CKD Stage")
     fig_3d_stage = px.scatter_3d(
         plot_data, x=x_3d, y=y_3d, z=z_3d, color='Target',
@@ -1059,7 +1054,7 @@ with tab6:
     st.plotly_chart(fig, use_container_width=True)
 
 # ============================================================================
-# TAB 7: ABOUT
+# TAB 7: ABOUT - WITH PROFILE SECTION
 # ============================================================================
 
 with tab7:
@@ -1117,6 +1112,7 @@ with tab7:
         </div>
         """, unsafe_allow_html=True)
         
+        # Profile Section
         st.markdown("""
         <div style="text-align: center; margin-top: 2rem;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
