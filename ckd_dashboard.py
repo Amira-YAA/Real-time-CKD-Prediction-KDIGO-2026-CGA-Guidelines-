@@ -827,8 +827,8 @@ with tab2:
     
     fig_scatter = px.scatter(
         data['df'],
-        x='Albumin_Creatinine_Ratio',
-        y='eGFR',
+        x='eGFR',
+        y='Albumin_Creatinine_Ratio',
         color='KDIGO_Risk_Level',
         symbol='CKD_Stage_CGA',
         title='eGFR vs Albuminuria with KDIGO Risk Levels',
@@ -837,8 +837,8 @@ with tab2:
         log_y=True,
         height=500
     )
-    fig_scatter.add_hline(x=30, line_dash="dash", line_color="orange", annotation_text="A2 Threshold")
-    fig_scatter.add_hline(x=300, line_dash="dash", line_color="red", annotation_text="A3 Threshold")
+    fig_scatter.add_hline(y=30, line_dash="dash", line_color="orange", annotation_text="A2 Threshold")
+    fig_scatter.add_hline(y=300, line_dash="dash", line_color="red", annotation_text="A3 Threshold")
     st.plotly_chart(fig_scatter, use_container_width=True)
 
     # Correlation heatmap
