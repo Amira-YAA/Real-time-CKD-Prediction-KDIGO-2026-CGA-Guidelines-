@@ -301,28 +301,36 @@ def prepare_data():
         'scaler': scaler
     }
 
-# ============================================================================
-# MODEL TRAINING
-# ============================================================================
-
 @st.cache_resource
 def train_models(_data):
     """Train multiple models for comparison"""
+    
     models = {
         'Random Forest': RandomForestClassifier(
-            n_estimators=200, max_depth=15, random_state=42, 
-            n_jobs=-1, class_weight='balanced'
+            n_estimators=200,
+            max_depth=15,
+            random_state=42,
+            n_jobs=-1,
+            class_weight='balanced'
         ),
         'HistGradientBoosting': HistGradientBoostingClassifier(
-            max_iter=100, max_depth=5, random_state=42
+            max_iter=100,
+            max_depth=5,
+            random_state=42
         ),
         'Logistic Regression': LogisticRegression(
-            max_iter=1000, random_state=42, multi_class='ovr', class_weight='balanced'
+            max_iter=1000,
+            random_state=42,
+            class_weight='balanced'
         ),
-        'KNN': KNeighborsClassifier(n_neighbors=11, weights='distance')
+        'KNN': KNeighborsClassifier(
+            n_neighbors=11,
+            weights='distance'
+        )
     }
     
     results = {}
+    
     for name, model in models.items():
         try:
             if name in ['Random Forest', 'HistGradientBoosting']:
@@ -340,7 +348,6 @@ def train_models(_data):
                 'f1_weighted': f1_score(_data['y_test'], y_pred, average='weighted')
             }
         except Exception as e:
-            st.warning(f"⚠️ Error training {name}: {str(e)[:100]}")
             results[name] = {
                 'model': None,
                 'y_pred': None,
