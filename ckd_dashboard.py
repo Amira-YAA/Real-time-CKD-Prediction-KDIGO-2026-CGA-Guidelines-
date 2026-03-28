@@ -587,7 +587,7 @@ with st.sidebar:
     st.markdown(f"- **Total samples:** {len(data['df'])}")
     st.markdown(f"- **Training:** {len(data['X_train'])} (80%)")
     st.markdown(f"- **Test:** {len(data['X_test'])} (20%)")
-    st.markdown(f"- **Features:** {len(data['feature_names'])}")
+    st.markdown(f"- **Key Features:** {len(data['feature_names'])}")
 
 # ============================================================================
 # MAIN HEADER
@@ -604,7 +604,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📊 EDA & CGA Analysis", 
     "🤖 Model Training", 
     "📈 2D Visualizations", 
-    "🎨 3D Visualizations",
+    "🧊 3D Visualizations",
     "⚖️ Model Comparison", 
     "ℹ️ About"
 ])
@@ -614,7 +614,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
 # ============================================================================
 
 with tab1:
-    st.header("🔮 Real-time CKD Prediction (KDIGO 2026 CGA Guidelines)")
+    st.header("Real-time CKD Prediction")
     
     col1, col2 = st.columns(2)
     
@@ -677,7 +677,7 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("### 📊 Key Clinical Parameters")
+        st.markdown("### Key Clinical Parameters")
         cp = result['clinical_params']
         
         col_a, col_b, col_c = st.columns(3)
@@ -714,7 +714,7 @@ with tab1:
         
         st.markdown("---")
         
-        st.subheader("🔍 Kidney Damage Assessment")
+        st.subheader("Kidney Damage Assessment")
         kd_details = result.get('kidney_damage_details', {})
         kidney_damage_factors = []
         kidney_damage_present = result['has_kidney_damage']
@@ -798,7 +798,7 @@ with tab1:
 # ============================================================================
 
 with tab2:
-    st.header("📊 Exploratory Data Analysis with CGA Staging")
+    st.header("Exploratory Data Analysis")
     
     col1, col2 = st.columns(2)
     
@@ -827,8 +827,8 @@ with tab2:
     
     fig_scatter = px.scatter(
         data['df'],
-        x='eGFR',
-        y='Albumin_Creatinine_Ratio',
+        x='Albumin_Creatinine_Ratio',
+        y='eGFR',
         color='KDIGO_Risk_Level',
         symbol='CKD_Stage_CGA',
         title='eGFR vs Albuminuria with KDIGO Risk Levels',
@@ -837,8 +837,8 @@ with tab2:
         log_y=True,
         height=500
     )
-    fig_scatter.add_hline(y=30, line_dash="dash", line_color="orange", annotation_text="A2 Threshold")
-    fig_scatter.add_hline(y=300, line_dash="dash", line_color="red", annotation_text="A3 Threshold")
+    fig_scatter.add_hline(x=30, line_dash="dash", line_color="orange", annotation_text="A2 Threshold")
+    fig_scatter.add_hline(x=300, line_dash="dash", line_color="red", annotation_text="A3 Threshold")
     st.plotly_chart(fig_scatter, use_container_width=True)
 
     # Correlation heatmap
@@ -914,20 +914,25 @@ with tab3:
                 col2.metric("Balanced Accuracy", f"{bal_acc:.4f}")
     
     elif model_choice == "Logistic Regression":
-        C_value = st.slider("Regularization (C)", 0.01, 10.0, 1.0, step=0.1)
-        
-        if st.button("Train Model", type="primary"):
-            with st.spinner("Training model..."):
-                model = LogisticRegression(C=C_value, max_iter=1000, random_state=42,
-                                          multi_class='ovr', class_weight='balanced')
-                model.fit(data['X_train_scaled'], data['y_train'])
-                y_pred = model.predict(data['X_test_scaled'])
-                acc = accuracy_score(data['y_test'], y_pred)
-                bal_acc = balanced_accuracy_score(data['y_test'], y_pred)
-                st.success(f"✅ Model trained successfully!")
-                col1, col2 = st.columns(2)
-                col1.metric("Accuracy", f"{acc:.4f}")
-                col2.metric("Balanced Accuracy", f"{bal_acc:.4f}")
+    C_value = st.slider("Regularization (C)", 0.01, 10.0, 1.0, step=0.1)
+    
+    if st.button("Train Model", type="primary"):
+        with st.spinner("Training model..."):
+            # REMOVED multi_class='ovr' - it's the default behavior
+            model = LogisticRegression(
+                C=C_value, 
+                max_iter=1000, 
+                random_state=42,
+                class_weight='balanced'
+            )
+            model.fit(data['X_train_scaled'], data['y_train'])
+            y_pred = model.predict(data['X_test_scaled'])
+            acc = accuracy_score(data['y_test'], y_pred)
+            bal_acc = balanced_accuracy_score(data['y_test'], y_pred)
+            st.success(f"✅ Model trained successfully!")
+            col1, col2 = st.columns(2)
+            col1.metric("Accuracy", f"{acc:.4f}")
+            col2.metric("Balanced Accuracy", f"{bal_acc:.4f}")
     
     else:  # KNN
         k_value = st.slider("k value", 3, 31, 11, step=2)
@@ -949,9 +954,8 @@ with tab3:
 # ============================================================================
 
 with tab4:
-    st.header("📈 2D Interactive Visualizations")
+    st.header("2D Interactive Visualizations")
     
-    st.subheader("Feature Importance")
     fig_importance = px.bar(
         feature_importance.head(15),
         x='importance', y='feature',
@@ -996,7 +1000,7 @@ with tab4:
 # ============================================================================
 
 with tab5:
-    st.header("🎨 3D Feature Visualization")
+    st.header("3D Feature Visualization")
     st.markdown("Explore relationships between three important features in 3D space")
     
     col1, col2, col3 = st.columns(3)
@@ -1039,7 +1043,7 @@ with tab5:
 # ============================================================================
 
 with tab6:
-    st.header("⚖️ Model Comparison")
+    st.header("Model Comparison")
     
     results_df = pd.DataFrame([
         {'Model': name, 'Accuracy': result['accuracy'], 
@@ -1065,19 +1069,19 @@ with tab6:
 # ============================================================================
 
 with tab7:
-    st.header("ℹ️ About This Project")
+    st.header("About Project")
     
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("""
         <div class="info-box">
-        <h3>🎯 Project Objective</h3>
+        <h3> Project Objective</h3>
         <p>To develop an accurate machine learning model for early detection and staging of Chronic Kidney Disease (CKD) using the KDIGO 2026 CGA (Cause-GFR-Albuminuria) classification system.</p>
         </div>
         
         <div class="info-box">
-        <h3>📊 KDIGO 2026 CGA Staging System</h3>
+        <h3> KDIGO 2026 CGA Staging System</h3>
         <p><strong>GFR Categories (G1-G5):</strong></p>
         <ul>
             <li><strong>G1:</strong> eGFR ≥ 90 (Normal/high)</li>
@@ -1096,7 +1100,7 @@ with tab7:
         </div>
         
         <div class="info-box">
-        <h3>🤖 Models Implemented</h3>
+        <h3> Models Implemented</h3>
         <ul>
             <li><strong>Random Forest</strong> - Ensemble of decision trees</li>
             <li><strong>HistGradientBoosting</strong> - Gradient boosting ensemble</li>
@@ -1130,7 +1134,7 @@ with tab7:
             </div>
             <h2>Data Analyst</h2>
             <p style="color: #666; font-size: 1.1rem;">Public Health | Nutritionist | GenAI | Researcher</p>
-            <p>🔗 <a href="https://www.linkedin.com/in/a-adnan-bns" target="_blank">https://www.linkedin.com/in/a-adnan-bns</a></p>
+            <p> <a href="https://www.linkedin.com/in/a-adnan-bns" target="_blank">https://www.linkedin.com/in/a-adnan-bns</a></p>
             <p>🐙 <a href="https://github.com/Amira-YAA" target="_blank">https://github.com/Amira-YAA</a></p>
         </div>
         """, unsafe_allow_html=True)
