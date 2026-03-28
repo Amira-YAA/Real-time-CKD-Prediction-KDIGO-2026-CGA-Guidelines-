@@ -914,24 +914,20 @@ with tab3:
                 col2.metric("Balanced Accuracy", f"{bal_acc:.4f}")
     
     elif model_choice == "Logistic Regression":
-      C_value = st.slider("Regularization (C)", 0.01, 10.0, 1.0, step=0.1)
-      
+        C_value = st.slider("Regularization (C)", 0.01, 10.0, 1.0, step=0.1)
+        
         if st.button("Train Model", type="primary"):
-           with st.spinner("Training model..."):
-                model = LogisticRegression(
-                C=C_value, 
-                max_iter=1000, 
-                random_state=42,
-                class_weight='balanced'
-                )
+            with st.spinner("Training model..."):
+                model = LogisticRegression(C=C_value, max_iter=1000, random_state=42,
+                                          class_weight='balanced')
                 model.fit(data['X_train_scaled'], data['y_train'])
-               y_pred = model.predict(data['X_test_scaled'])
-               acc = accuracy_score(data['y_test'], y_pred)
-               bal_acc = balanced_accuracy_score(data['y_test'], y_pred)
-               st.success(f"✅ Model trained successfully!")
-               col1, col2 = st.columns(2)
-               col1.metric("Accuracy", f"{acc:.4f}")
-               col2.metric("Balanced Accuracy", f"{bal_acc:.4f}")
+                y_pred = model.predict(data['X_test_scaled'])
+                acc = accuracy_score(data['y_test'], y_pred)
+                bal_acc = balanced_accuracy_score(data['y_test'], y_pred)
+                st.success(f"✅ Model trained successfully!")
+                col1, col2 = st.columns(2)
+                col1.metric("Accuracy", f"{acc:.4f}")
+                col2.metric("Balanced Accuracy", f"{bal_acc:.4f}")
     
     else:  # KNN
         k_value = st.slider("k value", 3, 31, 11, step=2)
