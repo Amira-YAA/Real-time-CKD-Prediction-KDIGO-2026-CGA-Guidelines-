@@ -187,7 +187,8 @@ LICENSE: CC0: Public Domain Kaggle Dataset: Chronic Kidney Disease (CKD) Clinica
 
 ### Clone Repository
 ```bash
-git clone https://github.com/yourusername/ckd-classification.git
+git clone https://github.com/Amira-YAA/ckd-classification.git
+
 cd ckd-classification
 
 ckd-classification/
