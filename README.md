@@ -23,6 +23,7 @@ An interactive machine learning dashboard for early detection and staging of Chr
 ## 🎯 Project Overview
 
 This project implements a comprehensive machine learning pipeline for **early detection and staging of Chronic Kidney Disease (CKD)** using clinical and laboratory measurements. The system follows the **KDIGO 2026 CGA (Cause-GFR-Albuminuria) guidelines** for accurate staging.
+LICENSE: CC0: Public Domain Kaggle Dataset: Chronic Kidney Disease (CKD) Clinical Dataset https://www.kaggle.com/datasets/priyankabarik/chronic-kidney-disease-ckd-clinical-dataset
 
 ### Key Highlights:
 - ✅ **Real-time CKD prediction** with interactive Streamlit dashboard
