@@ -187,11 +187,12 @@ LICENSE: CC0: Public Domain Kaggle Dataset: Chronic Kidney Disease (CKD) Clinica
 
 ### Clone Repository
 ```bash
-git clone https://github.com/Amira-YAA/ckd-classification.git
+git clone https://github.com/Amira-YAA/Real-time-CKD-Prediction-KDIGO-2026-CGA-Guidelines-.git
 
-cd ckd-classification
+# Navigate into the repository
+cd Real-time-CKD-Prediction-KDIGO-2026-CGA-Guidelines-
 
-ckd-classification/
+Real-time-CKD-Prediction-KDIGO-2026-CGA-Guidelines-/
 │
 ├── ckd_dashboard.py                 # Main Streamlit application
 ├── requirements.txt                 # Python dependencies
