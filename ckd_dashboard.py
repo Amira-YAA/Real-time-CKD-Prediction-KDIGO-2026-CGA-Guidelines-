@@ -821,25 +821,6 @@ with tab2:
         ax.set_title('CKD Stage Distribution (%)', fontsize=14, fontweight='bold')
         st.pyplot(fig)
         plt.close()
-    
-    st.subheader("GFR vs Albuminuria by CKD Stage")
-    risk_colors = {'Low': '#2ecc71', 'Moderate': '#f39c12', 'High': '#e74c3c', 'Very High': '#c0392b'}
-    
-    fig_scatter = px.scatter(
-        data['df'],
-        x='eGFR',
-        y='Albumin_Creatinine_Ratio',
-        color='KDIGO_Risk_Level',
-        symbol='CKD_Stage_CGA',
-        title='eGFR vs Albuminuria with KDIGO Risk Levels',
-        labels={'eGFR': 'eGFR (mL/min/1.73m²)', 'Albumin_Creatinine_Ratio': 'ACR (mg/g)'},
-        color_discrete_map=risk_colors,
-        log_y=True,
-        height=500
-    )
-    fig_scatter.add_hline(y=30, line_dash="dash", line_color="orange", annotation_text="A2 Threshold")
-    fig_scatter.add_hline(y=300, line_dash="dash", line_color="red", annotation_text="A3 Threshold")
-    st.plotly_chart(fig_scatter, use_container_width=True)
 
     # Correlation heatmap
     st.subheader("Correlation Heatmap")
