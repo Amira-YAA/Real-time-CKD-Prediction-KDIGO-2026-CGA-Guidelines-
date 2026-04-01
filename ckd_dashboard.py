@@ -261,7 +261,7 @@ def prepare_data():
     # Encode categorical variables
     for col in cat_cols:
         if col == 'Gender':
-            X[col] = X[col].map({'Male': 0, 'Female': 1})
+            X[col] = X[col].map({'Male': 1, 'Female': 0})
         else:
             X[col] = X[col].map({'No': 0, 'Yes': 1})
     
