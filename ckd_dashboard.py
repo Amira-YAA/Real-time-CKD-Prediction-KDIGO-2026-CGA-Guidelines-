@@ -367,7 +367,7 @@ def predict_ckd_stage(input_data, data, models):
     
     input_df = pd.DataFrame([input_data])
     
-    input_df['Gender'] = input_df['Gender'].map({'Male': 0, 'Female': 1})
+    input_df['Gender'] = input_df['Gender'].map({'Male': 1, 'Female': 0})
     input_df['Diabetes'] = input_df['Diabetes'].map({'No': 0, 'Yes': 1})
     input_df['Hypertension'] = input_df['Hypertension'].map({'No': 0, 'Yes': 1})
     input_df['Smoking_Status'] = input_df['Smoking_Status'].map({'No': 0, 'Yes': 1})
@@ -620,9 +620,9 @@ with tab1:
     
     with col1:
         st.subheader("Demographics & Medical History")
-        age = st.number_input("Age", min_value=18, max_value=100, value=50, step=1)
+        age = st.number_input("Age", min_value=18, max_value=200, value=50, step=1)
         gender = st.selectbox("Gender", ["Male", "Female"])
-        bmi = st.number_input("BMI", min_value=15.0, max_value=50.0, value=25.0, step=0.5)
+        bmi = st.number_input("BMI", min_value=15.0, max_value=200.0, value=25.0, step=0.5)
         systolic_bp = st.number_input("Systolic BP (mmHg)", min_value=90, max_value=200, value=125, step=5)
         diastolic_bp = st.number_input("Diastolic BP (mmHg)", min_value=60, max_value=120, value=85, step=5)
         diabetes = st.selectbox("Diabetes", ["No", "Yes"])
@@ -632,7 +632,7 @@ with tab1:
     
     with col2:
         st.subheader("Laboratory Tests")
-        hemoglobin = st.number_input("Hemoglobin (g/dL)", min_value=5.0, max_value=18.0, value=13.5, step=0.1)
+        hemoglobin = st.number_input("Hemoglobin (g/dL)", min_value=5.0, max_value=20.0, value=13.5, step=0.1)
         rbc = st.number_input("RBC Count (million/µL)", min_value=2.0, max_value=6.0, value=4.5, step=0.1)
         wbc = st.number_input("WBC Count (thousand/µL)", min_value=2.0, max_value=15.0, value=7.0, step=0.5)
         platelets = st.number_input("Platelet Count (thousand/µL)", min_value=100, max_value=500, value=250, step=10)
